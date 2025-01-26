@@ -1,22 +1,30 @@
 import ProductLister from '@/components/ProductLister';
+import { LoadingSpinner } from '@/components/Spinner';
 import { Suspense } from 'react';
 
 async function fetchProducts() {
   const response = await fetch('http://localhost:3000/api/products');
+  if (response.status !== 200) {
+    return null;
+  }
   return response.json();
 }
 
 export default async function Home() {
-  //TODO: Error handling, loading skeleton
   const products = await fetchProducts();
 
   return (
-    <div className='bg-[#f5f5f5] grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
-      <main className='flex flex-col gap-8 row-start-2 items-center sm:items-start'>
-        <Suspense fallback={<div>Loading...</div>}>
-          <ProductLister initialProductList={products} />
+    <main className='grid grid-rows-[20px_1fr_20px]  justify-items-center min-h-screen font-sans'>
+      <div className='flex flex-col gap-6 row-start-2 items-center'>
+        <h1 className='text-5xl font-semibold py-10'>See Products</h1>
+        <Suspense fallback={<LoadingSpinner />}>
+          {products ? (
+            <ProductLister initialProductList={products} />
+          ) : (
+            <p className='text-2xl'>Error fetching products</p>
+          )}
         </Suspense>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
